@@ -1,3 +1,4 @@
+// Import required modules
 const express = require('express');
 const app = express();
 const cors = require("cors");
@@ -8,16 +9,19 @@ const passport = require('passport');
 const passportJWT = require('passport-jwt');
 const jwt = require('jsonwebtoken');
 
+// Extract JWT components
 const JwtStrategy = passportJWT.Strategy;
 const ExtractJwt = passportJWT.ExtractJwt;
 
+// JWT options
 const jwtOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: process.env.JWT_SECRET
 };
 
+// Configure JWT strategy
 passport.use(new JwtStrategy(jwtOptions, (jwt_payload, done) => {
-    User.findById(jwt_payload._id)
+    userService.findUserById(jwt_payload._id)
         .then(user => {
             if (user) {
                 return done(null, user);
@@ -28,10 +32,10 @@ passport.use(new JwtStrategy(jwtOptions, (jwt_payload, done) => {
         .catch(err => done(err, false));
 }));
 
+// Initialize passport
 app.use(passport.initialize());
 
-const HTTP_PORT = process.env.PORT || 8080;
-
+// Middleware for JSON parsing and CORS
 app.use(express.json());
 app.use(cors());
 
@@ -115,11 +119,14 @@ app.delete("/api/user/history/:id", passport.authenticate('jwt', { session: fals
 console.log('JWT_SECRET:', process.env.JWT_SECRET);
 
 
+const HTTP_PORT = process.env.PORT || 8080;
 userService.connect()
-.then(() => {
-    app.listen(HTTP_PORT, () => { console.log("API listening on: " + HTTP_PORT) });
-})
-.catch((err) => {
-    console.log("unable to start the server: " + err);
-    process.exit();
-});
+    .then(() => {
+        app.listen(HTTP_PORT, () => {
+            console.log("API listening on: " + HTTP_PORT);
+        });
+    })
+    .catch((err) => {
+        console.error("Unable to start the server:", err);
+        process.exit(1); // Exit with non-zero code on failure
+    });
