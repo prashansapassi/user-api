@@ -119,7 +119,7 @@ app.delete("/api/user/history/:id", passport.authenticate('jwt', { session: fals
 console.log('JWT_SECRET:', process.env.JWT_SECRET);
 
 
-const HTTP_PORT = process.env.PORT || 8080;
+const HTTP_PORT = process.env.PORT || 3000;
 userService.connect()
     .then(() => {
         app.listen(HTTP_PORT, () => {
