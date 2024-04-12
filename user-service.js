@@ -32,18 +32,10 @@ module.exports.connect = function () {
     });
 };
 
-module.exports.disconnect = function () {
-    return new Promise(function (resolve, reject) {
-        mongoose.connection.close(() => {
-            resolve();
-        });
-    });
-};
-
 module.exports.registerUser = function (userData) {
     return new Promise(function (resolve, reject) {
 
-        if (userData.password!= userData.password2) {
+        if (userData.password != userData.password2) {
             reject("Passwords do not match");
         } else {
 
@@ -54,7 +46,7 @@ module.exports.registerUser = function (userData) {
                 let newUser = new User(userData);
 
                 newUser.save().then(() => {
-                    resolve("User " + userData.userName + " successfully registered");
+                    resolve("User " + userData.userName + " successfully registered");  
                 }).catch(err => {
                     if (err.code == 11000) {
                         reject("User Name already taken");
@@ -71,8 +63,8 @@ module.exports.checkUser = function (userData) {
     return new Promise(function (resolve, reject) {
 
         User.findOne({ userName: userData.userName })
-           .exec()
-           .then(user => {
+            .exec()
+            .then(user => {
                 bcrypt.compare(userData.password, user.password).then(res => {
                     if (res === true) {
                         resolve(user);
@@ -90,8 +82,8 @@ module.exports.getFavourites = function (id) {
     return new Promise(function (resolve, reject) {
 
         User.findById(id)
-           .exec()
-           .then(user => {
+            .exec()
+            .then(user => {
                 resolve(user.favourites)
             }).catch(err => {
                 reject(`Unable to get favourites for user with id: ${id}`);
@@ -109,8 +101,8 @@ module.exports.addFavourite = function (id, favId) {
                     { $addToSet: { favourites: favId } },
                     { new: true }
                 ).exec()
-                   .then(user => { resolve(user.favourites); })
-                   .catch(err => { reject(`Unable to update favourites for user with id: ${id}`); })
+                    .then(user => { resolve(user.favourites); })
+                    .catch(err => { reject(`Unable to update favourites for user with id: ${id}`); })
             } else {
                 reject(`Unable to update favourites for user with id: ${id}`);
             }
@@ -118,6 +110,8 @@ module.exports.addFavourite = function (id, favId) {
         })
 
     });
+
+
 }
 
 module.exports.removeFavourite = function (id, favId) {
@@ -126,10 +120,10 @@ module.exports.removeFavourite = function (id, favId) {
             { $pull: { favourites: favId } },
             { new: true }
         ).exec()
-           .then(user => {
+            .then(user => {
                 resolve(user.favourites);
             })
-           .catch(err => {
+            .catch(err => {
                 reject(`Unable to update favourites for user with id: ${id}`);
             })
     });
@@ -139,8 +133,8 @@ module.exports.getHistory = function (id) {
     return new Promise(function (resolve, reject) {
 
         User.findById(id)
-           .exec()
-           .then(user => {
+            .exec()
+            .then(user => {
                 resolve(user.history)
             }).catch(err => {
                 reject(`Unable to get history for user with id: ${id}`);
@@ -158,8 +152,8 @@ module.exports.addHistory = function (id, historyId) {
                     { $addToSet: { history: historyId } },
                     { new: true }
                 ).exec()
-                   .then(user => { resolve(user.history); })
-                   .catch(err => { reject(`Unable to update history for user with id: ${id}`); })
+                    .then(user => { resolve(user.history); })
+                    .catch(err => { reject(`Unable to update history for user with id: ${id}`); })
             } else {
                 reject(`Unable to update history for user with id: ${id}`);
             }
@@ -173,11 +167,11 @@ module.exports.removeHistory = function (id, historyId) {
             { $pull: { history: historyId } },
             { new: true }
         ).exec()
-           .then(user => {
+            .then(user => {
                 resolve(user.history);
             })
-           .catch(err => {
-            reject(`Unable to update history for user with id: ${id}`);
-        })
-});
+            .catch(err => {
+                reject(`Unable to update history for user with id: ${id}`);
+            })
+    });
 }
